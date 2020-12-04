@@ -1,4 +1,5 @@
 from regex import regex
+from bs4 import BeautifulSoup
 
 
 class Anime:
@@ -11,7 +12,10 @@ class Anime:
         return {
             'title': regex.sub(' +', ' ', self.title.strip()),
             'link': self.link,
-            'imageUrl': self.imageUrl
+            'cover': self.imageUrl,
+            'details': self.details,
+            'screens': self.screens,
+            'links': self.links
         }
 
 
