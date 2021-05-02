@@ -41,7 +41,8 @@ def details():
 
     """Anime name"""
     title = soup.find('i', class_="sh-msg short-success").text
-    title = re.sub('[^\x00-\x7F\x80-\xFF\u0100-\u017F\u0180-\u024F\u1E00-\u1EFF]', u'', title)
+    title = re.sub(
+        '[^\x00-\x7F\x80-\xFF\u0100-\u017F\u0180-\u024F\u1E00-\u1EFF]', u'', title)
     anime.title = re.sub(' +', ' ', title)
 
     """link"""
@@ -65,15 +66,16 @@ def details():
     url_links = soup.find('a', class_="ibtn iPrev ibtn-4").get('href')
 
     if url_links.find('tube.animesanka.com') != -1:
-        url_links = url_links.replace('tube.animesanka.com', 'www.animesanka.club')
+        url_links = url_links.replace(
+            'tube.animesanka.com', 'www.animesanka.club')
     elif url_links.find('tv.animesanka.net') != -1:
-        url_links = url_links.replace('tv.animesanka.net', 'www.animesanka.club')
+        url_links = url_links.replace(
+            'tv.animesanka.net', 'www.animesanka.club')
 
     page = requests.get(url_links)
     soup = BeautifulSoup(page.content, 'html.parser')
 
     all_links = soup.findAll('option', attrs={"data-links": True})
-    current_nbr_eps = len(all_links)
 
     for link in all_links:
         direct_links = {}
@@ -82,16 +84,11 @@ def details():
         list = link.get('data-links').split()
         for x in list:
             if x.find('@http') != -1:
-                direct_links[x.split("@")[0]] = x.split("@")[1]
-
-        list = link.get('data-watch').split()
-        for x in list:
-            if x.find('@http') != -1:
-                stream_links[x.split("@")[0]] = x.split("@")[1]
-
-        links[str(current_nbr_eps)] = {"Direct Links": direct_links, "Stream Links": stream_links}
-
-        current_nbr_eps -= 1
+                host = x.split("@")[0].split("-")[0]
+                links.setdefault(host, {})
+                direct_links = links[host]
+                direct_links[x.split("@")[0].split("-")[2]] = x.split("@")[1]
+                links[host] = direct_links
 
     anime.details = detail
     anime.screens = screens
